@@ -1,34 +1,51 @@
 # otuslabs
-Домашнее задание №1
-Проектирование адресного пространства
-Задачи:
-Собрать схему CLOS;
-Распределить адресное пространство.
-Выполнение:
-Собранная схема сети
+# otuslabs
+# Домашнее задание №1
+## Проектирование адресного пространства
+
+### Задачи:
+
+- Собрать схему CLOS;
+- Распределить адресное пространство.
+
+## Выполнение:
+
+### Собранная схема сети
+
+![](images/CLOS.png)
 
 
-Таблица адресов
-hostname	interface	IP/MASK	Description
-leaf-1	Loopback2	10.2.0.1 /32	
-leaf-1	eth 1/1	10.4.1.1 /31	to-spine-1
-leaf-1	eth 1/2	10.4.2.1 /31	to-spine-2
-leaf-2	Loopback2	10.2.0.2 /32	
-leaf-2	eth 1/1	10.4.1.3 /31	to-spine-1
-leaf-2	eth 1/2	10.4.2.3 /31	to-spine-2
-leaf-3	Loopback2	10.2.0.3 /32	
-leaf-3	eth 1/1	10.4.1.5 /31	to-spine-1
-leaf-3	eth 1/2	10.4.2.5 /31	to-spine-2
-spine-1	Loopback1	10.1.1.0/32	
-spine-1	eth 1/1	10.4.1.0/31	to-leaf-1
-spine-1	eth 1/2	10.4.1.2/31	to-leaf-2
-spine-1	eth 1/3	10.4.1.4/31	to-leaf-3
-spine-2	Loopback1	10.1.2.0/32	
-spine-2	eth 1/1	10.4.2.0/31	to-leaf-1
-spine-2	eth 1/2	10.4.2.2/31	to-leaf-2
-spine-2	eth 1/3	10.4.2.2/31	to-leaf-3
-Конфигурация оборудования
-leaf-1
+### Таблица адресов
+
+| hostname | interface |   IP/MASK   | Description |
+| :------: | :-------: | :----------: | :---------: |
+|  leaf-1  | Loopback2 | 10.2.0.1 /32 |            |
+|  leaf-1  |  eth 1/1  | 10.4.1.1 /31 | to-spine-1 |
+|  leaf-1  |  eth 1/2  | 10.4.2.1 /31 | to-spine-2 |
+|          |          |              |            |
+|  leaf-2  | Loopback2 | 10.2.0.2 /32 |            |
+|  leaf-2  |  eth 1/1  | 10.4.1.3 /31 | to-spine-1 |
+|  leaf-2  |  eth 1/2  | 10.4.2.3 /31 | to-spine-2 |
+|          |          |              |            |
+|  leaf-3  | Loopback2 | 10.2.0.3 /32 |            |
+|  leaf-3  |  eth 1/1  | 10.4.1.5 /31 | to-spine-1 |
+|  leaf-3  |  eth 1/2  | 10.4.2.5 /31 | to-spine-2 |
+|          |          |              |            |
+| spine-1 | Loopback1 | 10.1.1.0/32 |            |
+| spine-1 |  eth 1/1  | 10.4.1.0/31 |  to-leaf-1  |
+| spine-1 |  eth 1/2  | 10.4.1.2/31 |  to-leaf-2  |
+| spine-1 |  eth 1/3  | 10.4.1.4/31 |  to-leaf-3  |
+|          |          |              |            |
+| spine-2 | Loopback1 | 10.1.2.0/32 |            |
+| spine-2 |  eth 1/1  | 10.4.2.0/31 |  to-leaf-1  |
+| spine-2 |  eth 1/2  | 10.4.2.2/31 |  to-leaf-2  |
+| spine-2 |  eth 1/3  | 10.4.2.2/31 |  to-leaf-3  |
+
+### Конфигурация оборудования
+
+- #### [leaf-1](config/leaf-1.conf)
+
+```
 hostname leaf-1
 
 interface Ethernet1/1
@@ -45,7 +62,11 @@ interface Ethernet1/2
   
 interface loopback2
   ip address 10.1.0.1/32
-leaf-2
+```
+
+- #### [leaf-2](config/leaf-2.conf)
+
+```
 hostname leaf-2
 
 interface Ethernet1/1
@@ -62,7 +83,11 @@ interface Ethernet1/2
   
 interface loopback2
   ip address 10.1.0.2/32
-leaf-3
+```
+
+- #### [leaf-3](config/leaf-3.conf)
+
+```
 hostname leaf-3
 
 interface Ethernet1/1
@@ -79,7 +104,11 @@ interface Ethernet1/2
   
 interface loopback2
   ip address 10.1.0.3/32
-spine-1
+```
+
+- #### [spine-1](config/spine-1.conf)
+
+```
 hostname spine-1
 
 interface Ethernet1/1
@@ -102,7 +131,11 @@ interface Ethernet1/3
 
 interface loopback1
   ip address 10.1.1.0/32
-spine-2
+```
+
+- #### [spine-2](config/spine-2.conf)
+
+```
 hostname spine-2
 
 interface Ethernet1/1
@@ -125,8 +158,13 @@ interface Ethernet1/3
   
 interface loopback1
   ip address 10.1.2.0/32
-Проверка доступности
-spine-1
+```
+
+### Проверка доступности
+
+- #### spine-1
+
+~~~
 spine-1# ping 10.4.1.1
 PING 10.4.1.1 (10.4.1.1): 56 data bytes
 64 bytes from 10.4.1.1: icmp_seq=0 ttl=254 time=7.214 ms
@@ -165,7 +203,11 @@ PING 10.4.1.5 (10.4.1.5): 56 data bytes
 5 packets transmitted, 5 packets received, 0.00% packet loss
 round-trip min/avg/max = 4.066/4.784/6.107 ms
 spine-1#
-spine-2
+~~~
+
+- #### spine-2
+
+~~~
 spine-2# ping 10.4.2.1
 PING 10.4.2.1 (10.4.2.1): 56 data bytes
 64 bytes from 10.4.2.1: icmp_seq=0 ttl=254 time=4.581 ms
@@ -203,3 +245,4 @@ PING 10.4.2.5 (10.4.2.5): 56 data bytes
 --- 10.4.2.5 ping statistics ---
 5 packets transmitted, 5 packets received, 0.00% packet loss
 round-trip min/avg/max = 2.577/3.233/4.053 ms
+~~~
