@@ -161,4 +161,4 @@ interface loopback1
 
 ### Проверка доступности
 ![Иллюстрация к проекту](https://github.com/maximchekalov/otuslabs/blob/main/LABA1/spine2.PNG)
-![Иллюстрация к проекту]https://github.com/maximchekalov/otuslabs/blob/main/LABA1/spine1.PNG
+![Иллюстрация к проекту](https://github.com/maximchekalov/otuslabs/blob/main/LABA1/spine1.PNG)
