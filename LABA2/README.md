@@ -7,7 +7,7 @@
 - Проверить связанность между устройствами
 
 ## Выполнение:
-
+![Иллюстрация к проекту](https://github.com/maximchekalov/otuslabs/blob/main/LABA2/spine1.conf)
 ### Схема сети
 ![Иллюстрация к проекту](https://github.com/maximchekalov/otuslabs/blob/main/LABA1/topo.PNG) 
 
