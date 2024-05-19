@@ -8,6 +8,7 @@
 
 ## Выполнение:
 ## Spine2
+...
 hostname spine-2
 !
 spanning-tree mode mstp
@@ -74,7 +75,8 @@ router ospf 1
    log-adjacency-changes detail
 !
 end
-
+...
+...
 ##Spine1
 hostname spine-1
 !
@@ -142,6 +144,7 @@ router ospf 1
    log-adjacency-changes detail
 !
 end
+...
 
 ### Схема сети
 ![Иллюстрация к проекту](https://github.com/maximchekalov/otuslabs/blob/main/LABA1/topo.PNG) 
