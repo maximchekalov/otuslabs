@@ -77,8 +77,8 @@ router ospf 1
 !
 end
 ```
-```
 ##Spine1
+```
 hostname spine-1
 !
 spanning-tree mode mstp
