@@ -11,7 +11,7 @@
 
 ### Собранная схема сети
 
-[![image]([images/topo.png](https://github.com/maximchekalov/otuslabs/blob/main/LABA1/topo.PNG))]
+![Иллюстрация к проекту](https://github.com/maximchekalov/otuslabs/blob/main/LABA1/topo.PNG) 
 
 
 ### Таблица адресов
