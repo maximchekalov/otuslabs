@@ -1,0 +1,89 @@
+leaf1#sh run
+! Command: show running-config
+! device: leaf1 (vEOS-lab, EOS-4.27.3F)
+!
+! boot system flash:/vEOS-lab.swi
+!
+no aaa root
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model ribd
+!
+hostname leaf1
+!
+spanning-tree mode mstp
+!
+interface Ethernet1
+   description to-spine-1
+   no switchport
+   ip address 192.4.1.1/31
+   bfd interval 100 min-rx 100 multiplier 3
+   ip ospf neighbor bfd
+   ip ospf network point-to-point
+   ip ospf authentication message-digest
+   ip ospf area 0.0.0.0
+   ip ospf message-digest-key 11 md5 7 yDPXuPQG09LXmDBgF5D88g==
+   isis enable underlay
+   isis bfd
+   isis network point-to-point
+   isis authentication mode md5
+   isis authentication key 7 N+AG6ud8qGfiyO9U+KVZfg==
+!
+interface Ethernet2
+   description to-spine-2
+   no switchport
+   ip address 192.4.2.1/31
+   bfd interval 100 min-rx 100 multiplier 3
+   ip ospf neighbor bfd
+   ip ospf network point-to-point
+   ip ospf authentication message-digest
+   ip ospf area 0.0.0.0
+   ip ospf message-digest-key 21 md5 7 XFrihcEKe7nIAl47Ym/apg==
+   isis enable underlay
+   isis bfd
+   isis network point-to-point
+   isis authentication mode md5 level-1
+   isis authentication key 7 N+AG6ud8qGfTzXp1f0M49Q== level-1
+   isis authentication key 7 gbQcQlyKSq3kea4tBOMmtQ== level-2
+!
+interface Ethernet3
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Loopback1
+!
+interface Loopback2
+   ip address 192.1.0.1/32
+   isis enable underlay
+!
+interface Management1
+!
+ip routing
+!
+router isis underlay
+   net 49.0001.0100.0100.0001.00
+   is-type level-1
+   !
+   address-family ipv4 unicast
+      bfd all-interfaces
+!
+router ospf 1
+   router-id 192.1.0.1
+   shutdown
+   bfd default
+   passive-interface default
+   no passive-interface Ethernet1
+   no passive-interface Ethernet2
+   max-lsa 12000
+   log-adjacency-changes detail
+!
+end
