@@ -11,3 +11,8 @@ Underlay. IS-IS
 Схема сети
 
 ![image_CLOS_ISIS](https://github.com/maximchekalov/otuslabs/blob/main/LABA3/isis.PNG)
+
+
+Проверка доступности 
+![image_CLOS_ISIS]https://github.com/maximchekalov/otuslabs/blob/main/LABA3/spine1%20isis.PNG)
+![image_CLOS_ISIS](https://github.com/maximchekalov/otuslabs/blob/main/LABA3/spine2%20isis.PNG)
