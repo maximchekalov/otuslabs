@@ -15,4 +15,4 @@ Underlay. IS-IS
 
 Проверка доступности 
 ![image_1_ISIS](https://github.com/maximchekalov/otuslabs/blob/main/LABA3/spine1%20isis.PNG)
-![image_2_ISIS](https://github.com/maximchekalov/otuslabs/blob/main/LABA3/spine2%20isis.PNG))
+![image_2_ISIS](https://github.com/maximchekalov/otuslabs/blob/main/LABA3/spine2%20isis.PNG)
