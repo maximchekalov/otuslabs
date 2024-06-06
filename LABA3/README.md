@@ -9,4 +9,5 @@ Underlay. IS-IS
 Выполнение:
 
 Схема сети
+
 ![image_CLOS_ISIS](https://github.com/maximchekalov/otuslabs/blob/main/LABA3/isis.PNG)
