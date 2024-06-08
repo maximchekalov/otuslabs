@@ -1,1 +1,13 @@
-hello
+# Домашнее задание №4
+
+## Underlay. eBGP
+
+### Задача:
+
+- Настроить протокол eBGP для Underlay сети
+- Проверить связанность между устройствами
+
+## Выполнение:
+
+### Схема сети
+![image_CLOS_bgp](https://github.com/maximchekalov/otuslabs/blob/main/laba4/topo%20bgp.PNG)
