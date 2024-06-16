@@ -11,7 +11,7 @@
 
 
 ### Схема сети
-![image_CLOS_bgp](https://github.com/maximchekalov/otuslabs/blob/main/LABA5/EVPN.PNG)
+![image_CLOS_bgp](https://github.com/maximchekalov/otuslabs/blob/main/LABA5/BGPEVPN.PNG)
 
 ### Проверка конфигурации
 ![image_CLOS](https://github.com/maximchekalov/otuslabs/blob/main/LABA5/spinebgpsum.PNG)
