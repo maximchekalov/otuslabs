@@ -1,0 +1,153 @@
+leaf-3#sh run
+! Command: show running-config
+! device: leaf-3 (vEOS-lab, EOS-4.27.3F)
+!
+! boot system flash:/vEOS-lab.swi
+!
+no aaa root
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname leaf-3
+!
+spanning-tree mode mstp
+!
+vlan 100,200
+!
+interface Ethernet1
+   description to-spine-1
+   no switchport
+   ip address 192.4.1.5/31
+   bfd interval 100 min_rx 100 multiplier 3
+   ip ospf neighbor bfd
+   ip ospf network point-to-point
+   ip ospf authentication message-digest
+   ip ospf area 0.0.0.0
+   ip ospf message-digest-key 13 md5 7 77S5hnKxhWJ6iVr5bAaoDQ==
+   isis enable underlay
+   isis circuit-type level-1
+   no isis hello padding
+   isis network point-to-point
+   isis authentication mode md5 level-1
+   isis authentication key 7 N+AG6ud8qGefzRm3+jkpeQ== level-1
+   isis authentication key 7 gbQcQlyKSq2LFElGdPQMdQ== level-2
+!
+interface Ethernet2
+   description to-spine-2
+   no switchport
+   ip address 192.4.2.5/31
+   bfd interval 100 min_rx 100 multiplier 3
+   ip ospf neighbor bfd
+   ip ospf network point-to-point
+   ip ospf authentication message-digest
+   ip ospf area 0.0.0.0
+   ip ospf message-digest-key 23 md5 7 sBDK09qRIOTobg6bWrwctg==
+   isis enable underlay
+   isis circuit-type level-1
+   no isis hello padding
+   isis network point-to-point
+   isis authentication mode md5 level-1
+   isis authentication key 7 N+AG6ud8qGcA/SmYMsKcgw== level-1
+   isis authentication key 7 gbQcQlyKSq3BMvPXpKYGUg== level-2
+!
+interface Ethernet3
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Ethernet6
+   description to_vpc8
+   switchport access vlan 100
+!
+interface Ethernet7
+   description to_vpc7
+   switchport access vlan 200
+!
+interface Ethernet8
+!
+interface Loopback2
+   ip address 192.1.0.3/32
+   ip ospf area 0.0.0.0
+   isis enable underlay
+!
+interface Loopback100
+   description NVE Loopback
+   ip address 192.100.0.3/32
+!
+interface Management1
+!
+interface Vxlan1
+   vxlan source-interface Loopback100
+   vxlan udp-port 4789
+   vxlan vlan 100 vni 66610
+   vxlan vlan 200 vni 66620
+   vxlan learn-restrict any
+!
+ip routing
+!
+ip prefix-list PL_LOOP
+   seq 10 permit 192.1.0.3/32
+   seq 20 permit 192.100.0.3/32
+!
+route-map RM_CONN permit 10
+   match ip address prefix-list PL_LOOP
+!
+router bgp 65003
+   router-id 192.1.0.3
+   timers bgp 3 9
+   neighbor EVPN peer group
+   neighbor EVPN remote-as 65000
+   neighbor EVPN update-source Loopback2
+   neighbor EVPN ebgp-multihop 3
+   neighbor EVPN send-community extended
+   neighbor SPINE peer group
+   neighbor SPINE remote-as 65000
+   neighbor SPINE bfd
+   neighbor SPINE allowas-in 1
+   neighbor SPINE rib-in pre-policy retain all
+   neighbor SPINE password 7 9cdhNWhDdTM=
+   neighbor SPINE send-community
+   neighbor SPINE maximum-routes 1000
+   neighbor 192.1.1.0 peer group EVPN
+   neighbor 192.1.2.0 peer group EVPN
+   neighbor 192.4.1.4 peer group SPINE
+   neighbor 192.4.2.4 peer group SPINE
+   redistribute connected route-map RM_CONN
+   !
+   vlan 100
+      rd 65003:66610
+      route-target both 10:66610
+      redistribute learned
+   !
+   vlan 200
+      rd 65003:66620
+      route-target both 20:66620
+      redistribute learned
+   !
+   address-family evpn
+      neighbor EVPN activate
+!
+router isis underlay
+   shutdown
+   net 49.0001.0100.0100.0003.00
+   is-type level-1
+   !
+   address-family ipv4 unicast
+      bfd all-interfaces
+!
+router ospf 1
+   router-id 192.1.0.3
+   shutdown
+   bfd default
+   passive-interface default
+   no passive-interface Ethernet1
+   no passive-interface Ethernet2
+   max-lsa 12000
+   log-adjacency-changes detail
+!
+end
+leaf-3#
+leaf-3#
