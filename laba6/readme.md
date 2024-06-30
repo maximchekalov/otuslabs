@@ -11,3 +11,4 @@
 ## Выполнение:
 
 ### Схема сети
+![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/EVPN%20L3VPN%20topo.PNG)
