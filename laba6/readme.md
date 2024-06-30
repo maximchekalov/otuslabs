@@ -20,7 +20,7 @@
 ![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20mac-ip.PNG)
 ![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20vxlanvni.PNG)
 
-# VPC6 
+### VPC6 
 ![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/vpc6.PNG)
-# VPC9
+### VPC9
 ![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/vpc9.PNG)
