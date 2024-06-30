@@ -1,0 +1,126 @@
+leaf2#sh run
+! Command: show running-config
+! device: leaf2 (vEOS-lab, EOS-4.27.3F)
+!
+! boot system flash:/vEOS-lab.swi
+!
+no aaa root
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname leaf2
+!
+spanning-tree mode mstp
+!
+vlan 666,777
+!
+vrf instance OTUSLABS
+!
+interface Ethernet1
+   description to-spine-1
+   no switchport
+   ip address 192.4.1.3/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Ethernet2
+   description to-spine-2
+   no switchport
+   ip address 192.4.2.3/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Ethernet3
+   description to_vpc11
+   switchport access vlan 666
+!
+interface Ethernet4
+   description to_vpc7
+   switchport access vlan 777
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Loopback2
+   ip address 192.1.0.2/32
+!
+interface Loopback100
+   description NVE Loopback
+   ip address 192.100.0.2/32
+!
+interface Management1
+!
+interface Vlan666
+   vrf OTUSLABS
+   ip address virtual 10.10.12.253/24
+!
+interface Vlan777
+   vrf OTUSLABS
+   ip address virtual 10.10.77.254/24
+!
+interface Vxlan1
+   vxlan source-interface Loopback100
+   vxlan udp-port 4789
+   vxlan vlan 666 vni 10666
+   vxlan vlan 777 vni 10777
+   vxlan vrf OTUSLABS vni 999
+!
+ip virtual-router mac-address 00:00:00:00:00:02
+!
+ip routing
+ip routing vrf OTUSLABS
+!
+ip prefix-list PL_LOOP
+   seq 10 permit 192.1.0.2/32
+   seq 20 permit 192.100.0.2/32
+!
+route-map RM_CONN permit 10
+   match ip address prefix-list PL_LOOP
+!
+router bgp 65002
+   router-id 192.1.0.2
+   timers bgp 3 9
+   maximum-paths 2 ecmp 2
+   neighbor EVPN peer group
+   neighbor EVPN remote-as 65000
+   neighbor EVPN update-source Loopback2
+   neighbor EVPN ebgp-multihop 3
+   neighbor EVPN send-community extended
+   neighbor SPINE peer group
+   neighbor SPINE remote-as 65000
+   neighbor SPINE bfd
+   neighbor SPINE allowas-in 1
+   neighbor SPINE rib-in pre-policy retain all
+   neighbor SPINE password 7 9cdhNWhDdTM=
+   neighbor SPINE send-community
+   neighbor SPINE maximum-routes 1000
+   neighbor 192.1.1.0 peer group EVPN
+   neighbor 192.1.2.0 peer group EVPN
+   neighbor 192.4.1.2 peer group SPINE
+   neighbor 192.4.2.2 peer group SPINE
+   redistribute connected route-map RM_CONN
+   !
+   vlan 666
+      rd 65002:10666
+      route-target both 666:666
+      redistribute learned
+   !
+   vlan 777
+      rd 65002:10777
+      route-target both 777:777
+      redistribute learned
+   !
+   address-family evpn
+      neighbor EVPN activate
+   !
+   vrf OTUSLABS
+      rd 65002:999
+      route-target import evpn 999:999
+      route-target export evpn 999:999
+!
+end
