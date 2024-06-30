@@ -12,3 +12,10 @@
 
 ### Схема сети
 ![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/EVPN%20L3VPN%20topo.PNG)
+
+### Проверка связанности клиентов по L3
+![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20vrf.PNG)
+![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20arp.PNG)
+![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20ip%20prefix.PNG)
+![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20mac-ip.PNG)
+![](https://github.com/maximchekalov/otuslabs/blob/main/laba6/leaf1%20vxlanvni.PNG)
