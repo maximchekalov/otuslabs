@@ -12,7 +12,7 @@ VXLAN. Multihoming.
 Выполнение:
 Схема сети
 
-![image_CLOS_BGP_EVPN L3_MH]()
+![image_CLOS_BGP_EVPN L3_MH](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/MLAG.PNG)
 
 Конфигурация оборудования
 
