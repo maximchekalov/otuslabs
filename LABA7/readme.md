@@ -14,8 +14,6 @@ VXLAN. Multihoming.
 
 ![image_CLOS_BGP_EVPN L3_MH](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/MLAG.PNG)
 
-Конфигурация оборудования
-
-во вложенных файлах (конфиг уже большой, 1-й картинкой не вставить).
-
 Проверка доступности
+
+![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1mlag.PNG)
