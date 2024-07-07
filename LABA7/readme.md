@@ -18,3 +18,4 @@ VXLAN. Multihoming.
 
 ![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1mlag.PNG)
 ![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1evpn.PNG)
+![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1vxvlan.PNG)
