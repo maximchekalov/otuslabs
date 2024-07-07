@@ -20,3 +20,7 @@ VXLAN. Multihoming.
 ![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1evpn.PNG)
 ![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1vxvlan.PNG)
 ![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/leaf1vxvlanvni.PNG)
+![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/testcheme.PNG)
+
+Выключаем линки поочередно, во время испытация связность не прерывалась
+![image](https://github.com/maximchekalov/otuslabs/blob/main/LABA7/testmlag.PNG)
