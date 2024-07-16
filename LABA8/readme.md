@@ -16,3 +16,4 @@
 ![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_shiproute.PNG)
 ![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_evpn.PNG)
 ![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_vxvlan.PNG)
+![](https://github.com/maximchekalov/otuslabs/tree/main/LABA8)
