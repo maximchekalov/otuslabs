@@ -12,3 +12,5 @@
 
 ### Схема сети
 ![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_0.0.0.0.PNG)
+### Проверка
+![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_shiproute.PNG)
