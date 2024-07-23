@@ -20,3 +20,4 @@
 ![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_vpc.PNG)
 ### Ping между VRF через router
 ![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/L3VPN_0.0.0.0vrfping.PNG)
+![](https://github.com/maximchekalov/otuslabs/blob/main/LABA8/VPCping.PNG)
