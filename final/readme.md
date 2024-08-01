@@ -13,71 +13,57 @@
 - Проектирование клиентских подключений
 - Реализация
 
-## Разработка топология
-При проектировании топологии сети нужно понимать сколько трафика должно проходить по ней.
-В современных DC меньшую часть трафика занимает направление "север-юг" т.е. North-South, 
-а большая часть занимает трафик "восток-запад" или "East-West". 
-Сеть должна отвечать следующим основным требованиям:
+## Разработка топологии
+При разработке топологии сети важно учитывать объем трафика, который будет проходить через нее. В современных центрах обработки данных (DC) преобладает трафик направления "восток-запад" (East-West) по сравнению с направлением "север-юг" (North-South). Сетевая архитектура должна соответствовать следующим ключевым требованиям:
 - масштабируемость
 - отказоустойчивость
 - простота эксплуатации
 - отсутствие переподписки
 
-Если первые 3 пункта более-менее ясны, то про последний стоит немного сказать более подробно.
-Пропускная способность от свитчей куда включается клиентское оборудование должна быть одинаковой на всем пути прохождения трафика.
-Это в идеальном случае и не важно какой путь имеется ввиду North-South или East-West.
-Смысл переподписки в том, что сервисные свитчи (leaf) могут иметь большую пропускную способность в сторону клиентов,
-чем пропускная способность в сторону коммутационного уровня (Spine).
+Сеть для DC будеть иметь дизан CLOS, в которой имеются leaf и spine коммутаторы.
 
-Например, схема с 50ю даунлинками по 10Гб/с и 3мя аплинками по 100Гб/с на Leaf — это фабрика без переподписки 
-и даже при одновременной передаче данных всеми подключенными хостами — всегда хватит аплинков.
+Leaf - оборудование доступа, куда включаются конечные потребители сети.
 
-Всем указанным требованиям отвечает сеть CLOS (от имени Чарльза Клоза)
-Leaf свитчи это свитчи с максимальным функционалом на нем будут находится все сервисные включения
-Spine свитчи это свитчи с максимальной пропускной способностью. На этом уровне свитчей полностью отсуствуют клиентские включения.
-Leaf свитч включается во все Spine свитчи. 
-Нет подключений вида Spine-Spine, Leaf-Leaf.
+Spine - ядро сети, через которое проходит весь трафик между коммутаторами Leaf. Они не подключаются напрямую к серверам, а служат точками маршрутизации (или коммутации) для трафика между различными Leaf. К
 
 ![Пример сети CLOS](target_topo-1.avif "Пример сети CLOS")
 
-Для простоты конфигурации и придерживания принципа "сделать все максимально просто", 
-В качестве underlay и overlay будет использован eBGP и iBGP соответственно, а технологией туннелирования будет использован VxLAN.
+Для связности undelay будет применен протокол eBGP, для overlay связаности VxVlan.
 
 ## Проектирование адресного пространства
 
-Распределение адресов для Loopback интерфейсов
+Распределение адресов для Loopback и p2p интерфейсов
 
-| Device Type | IP Range | 
-|:-------------|:----------|
-| Leaf | 10.255.254.0/24|
-| Spine | 10.255.255.0/24|
+| hostname | interface |   IP/MASK   | Description |
+| :------: | :-------: | :----------: | :---------: |
+|  leaf-1  | Loopback2 | 192.2.0.1 /32 |            |
+|  leaf-1  |  eth 1/1  | 192.4.1.1 /31 | to-spine-1 |
+|  leaf-1  |  eth 1/2  | 192.4.2.1 /31 | to-spine-2 |
+|          |          |              |            |
+|  leaf-2  | Loopback2 | 192.2.0.2 /32 |            |
+|  leaf-2  |  eth 1/1  | 192.4.1.3 /31 | to-spine-1 |
+|  leaf-2  |  eth 1/2  | 192.4.2.3 /31 | to-spine-2 |
+|          |          |              |            |
+|  leaf-3  | Loopback2 | 192.2.0.3 /32 |            |
+|  leaf-3  |  eth 1/1  | 192.4.1.5 /31 | to-spine-1 |
+|  leaf-3  |  eth 1/2  | 192.4.2.5 /31 | to-spine-2 |
+|          |          |              |            |
+| spine-1 | Loopback1 | 192.1.1.0/32 |            |
+| spine-1 |  eth 1/1  | 192.4.1.0/31 |  to-leaf-1  |
+| spine-1 |  eth 1/2  | 192.4.1.2/31 |  to-leaf-2  |
+| spine-1 |  eth 1/3  | 192.4.1.4/31 |  to-leaf-3  |
+|          |          |              |            |
+| spine-2 | Loopback1 | 192.1.2.0/32 |            |
+| spine-2 |  eth 1/1  | 192.4.2.0/31 |  to-leaf-1  |
+| spine-2 |  eth 1/2  | 192.4.2.2/31 |  to-leaf-2  |
+| spine-2 |  eth 1/3  | 192.4.2.2/31 |  to-leaf-3  |
 
-Распределение адресов для p2p интерфейсов<br />
-Leaf-N <-> Spine | 10.0.n.l/30.<br />
-Где:<br />
-N - номер leaf свитча, <br />
-L - номер линка, считатся от номера сети. 0, 4, 8, и т.д.<br />
-
-На Leaf младший адрес<br />
-На Spine старший адрес<br />
 
 
 ## Проектирование сети Underlay
-BGP протокол имеет мощный функционал по управлению анонсами и с легкостью справится даже с самыми большими DC сетями.
-Основной момент в Underlay сети такой, что каждый leaf свитч имеет свой уникальный ASN, а все Spine свитчи находятся в одной ASN.
-leaf-1 65511, 
-leaf-2 65512,
-leaf-3 65513,
-Spine-1, Spine-2 65501
+BGP удобен в использовании сетях DC, т.к можно гибко управлять трафиком, так же используя дополнительные фишки такие как ECMP для балансировки, MP-BGP для переноса сигнальной информации других протоколов.
 
-eBGP сессия поднимается на point-to-point линках и принимают и анонсируют только loopback адреса, т.е. `family unicast`.
-Между Spine свитчами нужно обеспечить обмен префиксов для этого необходимо включить `as-loop-in 1` или `as-override`, чтобы leaf свитч принимая префикс от spine-2 и анонсируя их в сторону spine-1, spine-1 их принимал. т.е. отключаем встроенную в BGP механизм предотвращения петель, ровно на одно вхождение.
-Далее чтобы свитч в принципе начала анонсировать маршруты из той же AS с кем настроено соседство нужно включить опцию `advertise-peer-as`
-
-Поскольку у нас есть множество путей между leaf свитчами, трафик должен быть разбалансирован между всеми имеющимися маршрутами, а поскольку у нас eBGP и с разными внешними AS, то необходимо включить `multipath multiple-as`, что позволит использовать ECMP.
-
-![Сеть Underlay](topology-bgp.png "Сеть Underlay")
-
+eBGP работет по p2p и переносит только инфу о lo адресах.
 
 ## Проектирование сети Overlay
 Overlay сеть так же будет работать на основе протокола BGP, поскольку underlay нам обеспечил связность loopback адресов, то мы можем с легкостью использовать iBGP.
@@ -104,189 +90,221 @@ L2 на основе EVPN
 
 leaf-1
 ```
-set policy-options policy-statement BGP_LOOPBACK0 term TERM1 from protocol direct
-set policy-options policy-statement BGP_LOOPBACK0 term TERM1 from route-filter 0.0.0.0/0 prefix-length-range /32-/32
-set policy-options policy-statement BGP_LOOPBACK0 term TERM1 then accept
-set protocols bgp group UNDERLAY export BGP_LOOPBACK0
-
-set policy-options policy-statement PFE-ECMP then load-balance per-packet
-set routing-options forwarding-table export PFE-ECMP
-
-set protocols bgp group UNDERLAY type external
-set protocols bgp group UNDERLAY advertise-peer-as
-set protocols bgp group UNDERLAY family inet unicast
-set protocols bgp group UNDERLAY export BGP_LOOPBACK0
-set protocols bgp group UNDERLAY peer-as 65501
-set protocols bgp group UNDERLAY local-as 65511
-set protocols bgp group UNDERLAY multipath multiple-as
-set protocols bgp group UNDERLAY as-override
-set protocols bgp group UNDERLAY neighbor 10.0.1.2
-set protocols bgp group UNDERLAY neighbor 10.0.1.6
-
+hostname leaf1
+!
+spanning-tree mode mstp
+no spanning-tree vlan-id 4094
+!
+vlan 100,200
+!
+vlan 4094
+   trunk group mlag
+!
+vrf instance OTUSLABS
+!
+interface Port-Channel1
+   description peerlink
+   switchport mode trunk
+   switchport trunk group mlag
+!
+interface Port-Channel2
+   description to_srv_mlag
+   switchport trunk allowed vlan 100,200
+   switchport mode trunk
+   mlag 2
+!
+interface Ethernet1
+   description to-spine-1
+   no switchport
+   ip address 192.4.1.1/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Ethernet2
+   description to-spine-2
+   no switchport
+   ip address 192.4.2.1/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Ethernet3
+   description to_leaf_2
+   channel-group 1 mode active
+!
+interface Ethernet4
+   description to_SRV
+   channel-group 2 mode active
+!
+interface Ethernet5
+   description to_leaf2
+   channel-group 1 mode active
+!
+interface Loopback2
+   ip address 192.1.0.1/32
+!
+interface Loopback100
+   description NVE_Loopback
+   ip address 192.100.0.1/32
+!
+interface Management1
+!
+interface Vlan100
+   vrf OTUSLABS
+   ip address virtual 10.10.2.254/24
+!
+interface Vlan200
+   vrf OTUSLABS
+   ip address virtual 10.10.3.253/24
+!
+interface Vlan4094
+   ip address 10.10.100.0/31
+!
+interface Vxlan1
+   vxlan source-interface Loopback100
+   vxlan udp-port 4789
+   vxlan vlan 100 vni 100100
+   vxlan vlan 200 vni 100200
+   vxlan vrf OTUSLABS vni 999
+   vxlan virtual-vtep local-interface Loopback100
+!
+ip virtual-router mac-address 00:00:00:00:00:01
+!
+ip routing
+ip routing vrf OTUSLABS
+!
+ip prefix-list PL_LOOP
+   seq 10 permit 192.1.0.1/32
+   seq 20 permit 192.100.0.1/32
+!
+mlag configuration
+   domain-id mlag1
+   local-interface Vlan4094
+   peer-address 10.10.100.1
+   peer-link Port-Channel1
+!
+route-map RM_CONN permit 10
+   match ip address prefix-list PL_LOOP
+!
+router bgp 65001
+   router-id 192.1.0.1
+   timers bgp 3 9
+   maximum-paths 2 ecmp 2
+   neighbor EVPN peer group
+   neighbor EVPN remote-as 65000
+   neighbor EVPN update-source Loopback2
+   neighbor EVPN ebgp-multihop 3
+   neighbor EVPN send-community extended
+   neighbor SPINE peer group
+   neighbor SPINE remote-as 65000
+   neighbor SPINE bfd
+   neighbor SPINE allowas-in 1
+   neighbor SPINE rib-in pre-policy retain all
+   neighbor SPINE password 7 9cdhNWhDdTM=
+   neighbor SPINE send-community
+   neighbor SPINE maximum-routes 1000
+   neighbor 192.1.1.0 peer group EVPN
+   neighbor 192.1.2.0 peer group EVPN
+   neighbor 192.4.1.0 peer group SPINE
+   neighbor 192.4.2.0 peer group SPINE
+   redistribute connected route-map RM_CONN
+   !
+   vlan 100
+      rd 65001:100100
+      route-target both 100:100
+      redistribute learned
+   !
+   vlan 200
+      rd 65001:100200
+      route-target both 200:200
+      redistribute learned
+   !
+   vlan 666
+      rd 65001:10666
+      route-target both 666:666
+      redistribute learned
+   !
+   address-family evpn
+      neighbor EVPN activate
+   !
+   vrf OTUSLABS
+      rd 65001:999
+      route-target import evpn 999:999
+      route-target export evpn 999:999
+      redistribute connected
+!
+end
 ```
 spine-1
 ```
-set protocols bgp group UNDERLAY type external
-set protocols bgp group UNDERLAY local-as 65501
-set protocols bgp group UNDERLAY neighbor 10.0.1.1 peer-as 65511
-set protocols bgp group UNDERLAY neighbor 10.0.2.1 peer-as 65512
-set protocols bgp group UNDERLAY neighbor 10.0.3.1 peer-as 65513
-set protocols bgp group UNDERLAY hold-time 10
-set protocols bgp group UNDERLAY family inet unicast
-set protocols bgp group UNDERLAY multipath multiple-as
-
-set policy-options policy-statement PFE-ECMP then load-balance per-packet
-set routing-options forwarding-table export PFE-ECMP
+hostname spine-1
+!
+spanning-tree mode mstp
+!
+interface Ethernet1
+   description to-leaf-1
+   no switchport
+   ip address 192.4.1.0/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Ethernet2
+   description to-leaf-2
+   no switchport
+   ip address 192.4.1.2/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Ethernet3
+   description to-leaf-3
+   no switchport
+   ip address 192.4.1.4/31
+   bfd interval 100 min-rx 100 multiplier 3
+!
+interface Loopback1
+   ip address 192.1.1.0/32
+   ip ospf area 0.0.0.0
+   isis enable underlay
+!
+interface Management1
+!
+ip routing
+!
+ip prefix-list PL_LOOP
+   seq 10 permit 192.1.1.0/32
+!
+route-map RM_CONN permit 10
+   match ip address prefix-list PL_LOOP
+!
+peer-filter EVPN
+   10 match as-range 65001-65003 result accept
+!
+peer-filter LEAF
+   10 match as-range 65001-65003 result accept
+!
+router bgp 65000
+   router-id 192.1.1.0
+   timers bgp 3 9
+   maximum-paths 2 ecmp 2
+   bgp listen range 192.1.0.0/24 peer-group EVPN peer-filter EVPN
+   bgp listen range 192.4.1.0/24 peer-group LEAF peer-filter LEAF
+   neighbor EVPN peer group
+   neighbor EVPN next-hop-unchanged
+   neighbor EVPN update-source Loopback1
+   neighbor EVPN ebgp-multihop 3
+   neighbor EVPN send-community extended
+   neighbor LEAF peer group
+   neighbor LEAF bfd
+   neighbor LEAF rib-in pre-policy retain all
+   neighbor LEAF password 7 7zCpOlU0aME=
+   neighbor LEAF send-community
+   neighbor LEAF maximum-routes 1000
+   redistribute connected route-map RM_CONN
+   !
+   address-family evpn
+      neighbor EVPN activate
+!
+end
 ```
 
-#### Пример конфигурации Overlay
-Leaf-1
-```
-set routing-options autonomous-system 4210000001
-set protocols bgp group OVERLAY type internal
-set protocols bgp group OVERLAY local-address 10.255.254.1
-set protocols bgp group OVERLAY family evpn signaling
-set protocols bgp group OVERLAY neighbor 10.255.255.1
-set protocols bgp group OVERLAY neighbor 10.255.255.2
-```
-Spine-1
-```
-set routing-options autonomous-system 4210000001
-set protocols bgp group OVERLAY type internal
-set protocols bgp group OVERLAY local-address 10.255.255.1
-set protocols bgp group OVERLAY family evpn signaling
-set protocols bgp group OVERLAY cluster 10.255.250.1
-set protocols bgp group OVERLAY multipath
-set protocols bgp group OVERLAY neighbor 10.255.254.1
-set protocols bgp group OVERLAY neighbor 10.255.254.2
-set protocols bgp group OVERLAY neighbor 10.255.254.3
-```
 
 
-#### Пример конфигурации L2 EVPN
-Leaf-1
-```
-set interfaces ge-0/0/2 vlan-tagging
-set interfaces ge-0/0/2 encapsulation flexible-ethernet-services
-set interfaces ge-0/0/2 unit 0 encapsulation vlan-bridge
-set interfaces ge-0/0/2 unit 0 vlan-id 10
-
-set routing-instances EVPN_10 vtep-source-interface lo0.0
-set routing-instances EVPN_10 instance-type evpn
-set routing-instances EVPN_10 vlan-id 10
-set routing-instances EVPN_10 interface ge-0/0/2.0
-set routing-instances EVPN_10 vxlan vni 10010
-set routing-instances EVPN_10 route-distinguisher 10.255.254.1:1
-set routing-instances EVPN_10 vrf-target target:1234:1
-set routing-instances EVPN_10 protocols evpn encapsulation vxlan
-```
-
-Leaf-3
-```
-set interfaces ge-0/0/2 vlan-tagging
-set interfaces ge-0/0/2 encapsulation flexible-ethernet-services
-set interfaces ge-0/0/2 unit 0 encapsulation vlan-bridge
-set interfaces ge-0/0/2 unit 0 vlan-id 10
-
-set routing-instances EVPN_10 vtep-source-interface lo0.0
-set routing-instances EVPN_10 instance-type evpn
-set routing-instances EVPN_10 vlan-id 10
-set routing-instances EVPN_10 interface ge-0/0/2.0
-set routing-instances EVPN_10 vxlan vni 10010
-set routing-instances EVPN_10 route-distinguisher 10.255.254.3:1
-set routing-instances EVPN_10 vrf-target target:1234:1
-set routing-instances EVPN_10 protocols evpn encapsulation vxlan
-```
-
-#### Пример конфигурации L3 EVPN
-
-Leaf-1
-```
-set interfaces ge-0/0/2 flexible-vlan-tagging
-set interfaces ge-0/0/2 encapsulation extended-vlan-bridge
-set interfaces ge-0/0/2 unit 10 vlan-id 10
-set interfaces irb unit 10 virtual-gateway-accept-data
-set interfaces irb unit 10 family inet address 10.5.5.100/24 virtual-gateway-address 10.5.5.254
-
-set policy-options policy-statement mac10-import term local-orig from community v10
-set policy-options policy-statement mac10-import term local-orig then accept
-set policy-options policy-statement mac10-import term v20-orig from community v20
-set policy-options policy-statement mac10-import term v20-orig then accept
-set policy-options policy-statement mac10-import term v30-orig from community v30
-set policy-options policy-statement mac10-import term v30-orig then accept
-
-set policy-options policy-statement vrf10-import from community v10-vrf
-set policy-options policy-statement vrf10-import from community v20-vrf
-set policy-options policy-statement vrf10-import from community v30-vrf
-set policy-options policy-statement vrf10-import then accept
-
-set routing-instances v10 instance-type mac-vrf
-set routing-instances v10 protocols evpn encapsulation vxlan
-set routing-instances v10 protocols evpn extended-vni-list 10010
-set routing-instances v10 vtep-source-interface lo0.0
-set routing-instances v10 bridge-domains v10 vlan-id 10
-set routing-instances v10 bridge-domains v10 interface ge-0/0/2.10
-set routing-instances v10 bridge-domains v10 routing-interface irb.10
-set routing-instances v10 bridge-domains v10 vxlan vni 10010
-set routing-instances v10 service-type vlan-based
-set routing-instances v10 route-distinguisher 10.255.254.1:1
-set routing-instances v10 vrf-import mac10-import
-set routing-instances v10 vrf-target target:42011:10
-set routing-instances v10-vrf instance-type vrf
-set routing-instances v10-vrf routing-options auto-export
-set routing-instances v10-vrf protocols evpn irb-symmetric-routing vni 9910
-set routing-instances v10-vrf interface irb.10
-set routing-instances v10-vrf route-distinguisher 10.255.254.1:100
-set routing-instances v10-vrf vrf-import vrf10-import
-set routing-instances v10-vrf vrf-target target:42011:1010
-set routing-instances v10-vrf vrf-table-label
-```
-
-Leaf-3
-```
-set interfaces ge-0/0/2 flexible-vlan-tagging
-set interfaces ge-0/0/2 encapsulation extended-vlan-bridge
-set interfaces ge-0/0/2 unit 10 vlan-id 10
-set interfaces irb unit 10 virtual-gateway-accept-data
-set interfaces irb unit 10 family inet address 10.5.5.200/24 virtual-gateway-address 10.5.5.254
-
-set policy-options policy-statement mac10-import term local-orig from community v10
-set policy-options policy-statement mac10-import term local-orig then accept
-set policy-options policy-statement mac10-import term v20-orig from community v20
-set policy-options policy-statement mac10-import term v20-orig then accept
-set policy-options policy-statement mac10-import term v30-orig from community v30
-set policy-options policy-statement mac10-import term v30-orig then accept
-
-set policy-options policy-statement vrf10-import from community v10-vrf
-set policy-options policy-statement vrf10-import from community v20-vrf
-set policy-options policy-statement vrf10-import from community v30-vrf
-set policy-options policy-statement vrf10-import then accept
-
-set routing-instances v10 instance-type mac-vrf
-set routing-instances v10 protocols evpn encapsulation vxlan
-set routing-instances v10 protocols evpn extended-vni-list 10010
-set routing-instances v10 vtep-source-interface lo0.0
-set routing-instances v10 bridge-domains v10 vlan-id 10
-set routing-instances v10 bridge-domains v10 interface ge-0/0/2.10
-set routing-instances v10 bridge-domains v10 routing-interface irb.10
-set routing-instances v10 bridge-domains v10 vxlan vni 10010
-set routing-instances v10 service-type vlan-based
-set routing-instances v10 route-distinguisher 10.255.254.3:1
-set routing-instances v10 vrf-import mac10-import
-set routing-instances v10 vrf-target target:42011:10
-set routing-instances v10-vrf instance-type vrf
-set routing-instances v10-vrf routing-options auto-export
-set routing-instances v10-vrf protocols evpn irb-symmetric-routing vni 9910
-set routing-instances v10-vrf interface irb.10
-set routing-instances v10-vrf route-distinguisher 10.255.254.3:100
-set routing-instances v10-vrf vrf-import vrf10-import
-set routing-instances v10-vrf vrf-target target:42011:1010
-set routing-instances v10-vrf vrf-table-label
-```
-
-Полная конфигурация в папке device-configs.
-
-### Финальная конфигурация сети 
+### Топология сети 
 
 ![Целевая сеть](topology-final.png "Целевая сеть")
 
