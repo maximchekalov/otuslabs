@@ -299,444 +299,221 @@ end
 ![image](https://github.com/maximchekalov/otuslabs/blob/main/final/CLOS%20Final.PNG)
 
 
-### BGP соседства Underlay
+### Вывод диангостической информации 
+Leaf1
+```
+leaf1#sh ip bgp summary
+BGP summary information for VRF default
+Router identifier 192.1.0.1, local AS number 65001
+Neighbor Status Codes: m - Under maintenance
+  Neighbor  V AS           MsgRcvd   MsgSent  InQ OutQ  Up/Down State   PfxRcd PfxAcc
+  192.1.1.0 4 65000           3117      3101    0    0 01:49:57 Estab   5      5
+  192.1.2.0 4 65000           3065      3136    0    0 01:49:58 Estab   5      5
+  192.4.1.0 4 65000           2737      2770    0    0 00:03:02 Estab   5      5
+  192.4.2.0 4 65000           2715      2751    0    0 00:03:02 Estab   5      5
 
-Пример вывода BGP соседств с leaf-3
-```
-root@leaf-3> show bgp summary 
-Groups: 1 Peers: 2 Down peers: 0
-Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
-inet.0
-                       4          4          0          0          0          0
-Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
-10.0.3.2              65501        181        177       0       0        8:55 2/2/2/0              0/0/0/0
-10.0.3.6              65501         19         17       0       0          44 2/2/2/0              0/0/0/0
-```
-
-Пример вывода BGP соседств со spine-1
-```
-root@spine-1> show bgp summary 
-Groups: 1 Peers: 3 Down peers: 0
-Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
-inet.0
-                       3          3          0          0          0          0
-Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
-10.0.1.1              65511        294        262       0       0       13:07 1/1/1/0              0/0/0/0
-10.0.2.1              65512        163        165       0       0        8:13 1/1/1/0              0/0/0/0
-10.0.3.1              65513        181        183       0       0        9:08 1/1/1/0              0/0/0/0
 ```
 
-
-### BGP соседства Overlay
-
+Spine1
 ```
-root@leaf-3> show bgp summary
-Threading mode: BGP I/O
-Groups: 2 Peers: 4 Down peers: 0
-Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
-inet.0
-                       8          6          0          0          0          0
-bgp.evpn.0
-                      12          6          0          0          0          0
-Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
-10.0.3.2              65501        992        998       0       0       45:02 Establ
-  inet.0: 3/4/4/0
-10.0.3.6              65501        994        997       0       0       45:12 Establ
-  inet.0: 3/4/4/0
-10.255.255.1     4210000001       1337       1339       0       0     1:00:29 Establ
-  EVPN_10.evpn.0: 3/3/3/0
-  EVPN_20.evpn.0: 3/3/3/0
-  __default_evpn__.evpn.0: 0/0/0/0
-  bgp.evpn.0: 6/6/6/0
-10.255.255.2     4210000001       1339       1342       0       0     1:00:39 Establ
-  EVPN_10.evpn.0: 0/3/3/0
-  EVPN_20.evpn.0: 0/3/3/0
-  __default_evpn__.evpn.0: 0/0/0/0
-  bgp.evpn.0: 0/6/6/0
-```
-
-
-```
-root@spine-1> show bgp summary
-Threading mode: BGP I/O
-Groups: 3 Peers: 7 Down peers: 0
-Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
-inet.0
-                      10          6          0          0          0          0
-bgp.evpn.0
-                      12         12          0          0          0          0
-Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
-10.0.1.1              65511       1044       1035       0       2       46:57 Establ
-  inet.0: 2/3/3/0
-10.0.2.1              65512       1014       1012       0       1       45:51 Establ
-  inet.0: 2/3/3/0
-10.0.3.1              65513       1008       1001       0       1       45:28 Establ
-  inet.0: 2/4/4/0
-10.255.254.1     4210000001       1031       1025       0       2       46:30 Establ
-  bgp.evpn.0: 3/3/3/0
-10.255.254.2     4210000001       1354       1363       0       0     1:01:15 Establ
-  bgp.evpn.0: 3/3/3/0
-10.255.254.3     4210000001       1349       1345       0       0     1:00:55 Establ
-  bgp.evpn.0: 6/6/6/0
-10.255.255.2     4210000001        119        118       0       0       46:55 Establ
-  bgp.evpn.0: 0/0/0/0
-```
-
-Анонсирование и получение MAC/IP с Spine-1 в сторону Leaf-1
-```
-root@spine-1> show route advertising-protocol bgp 10.255.254.1
-
-bgp.evpn.0: 12 destinations, 12 routes (12 active, 0 holddown, 0 hidden)
-  Prefix                  Nexthop              MED     Lclpref    AS path
-  2:10.255.254.2:2::0::aa:bb:cc:00:04:00/304 MAC/IP
-*                         10.255.254.2                 100        I
-  2:10.255.254.3:1::0::aa:bb:cc:00:0c:00/304 MAC/IP
-*                         10.255.254.3                 100        I
-  2:10.255.254.3:2::0::aa:bb:cc:00:02:00/304 MAC/IP
-*                         10.255.254.3                 100        I
-  2:10.255.254.2:2::0::aa:bb:cc:00:04:00::172.17.0.1/304 MAC/IP
-*                         10.255.254.2                 100        I
-  2:10.255.254.3:1::0::aa:bb:cc:00:0c:00::10.5.5.20/304 MAC/IP
-*                         10.255.254.3                 100        I
-  2:10.255.254.3:2::0::aa:bb:cc:00:02:00::172.17.0.2/304 MAC/IP
-*                         10.255.254.3                 100        I
-  3:10.255.254.2:2::0::10.255.254.2/248 IM
-*                         10.255.254.2                 100        I
-  3:10.255.254.3:1::0::10.255.254.3/248 IM
-*                         10.255.254.3                 100        I
-  3:10.255.254.3:2::0::10.255.254.3/248 IM
-*                         10.255.254.3                 100        I
-
-root@spine-1> show route receive-protocol bgp 10.255.254.1
-
-inet.0: 11 destinations, 17 routes (11 active, 0 holddown, 0 hidden)
-
-inet6.0: 3 destinations, 3 routes (3 active, 0 holddown, 0 hidden)
-
-bgp.evpn.0: 12 destinations, 12 routes (12 active, 0 holddown, 0 hidden)
-  Prefix                  Nexthop              MED     Lclpref    AS path
-  2:10.255.254.1:1::0::aa:bb:cc:00:0b:00/304 MAC/IP
-*                         10.255.254.1                 100        I
-  2:10.255.254.1:1::0::aa:bb:cc:00:0b:00::10.5.5.10/304 MAC/IP
-*                         10.255.254.1                 100        I
-  3:10.255.254.1:1::0::10.255.254.1/248 IM
-*                         10.255.254.1                 100        I
-
-root@spine-1>
-```
-
-### Связность всех между собой
-
-Доступность R1->R3
-```
-R1#show ip int br
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                unassigned      YES unset  up                    up
-Ethernet0/0.10             10.5.5.10       YES manual up                    up
-Ethernet0/1                unassigned      YES unset  administratively down down
-Ethernet0/2                unassigned      YES unset  administratively down down
-Ethernet0/3                unassigned      YES unset  administratively down down
-R1#ping 10.5.5.20
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 10.5.5.20, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 4/5/8 ms
-R1#
-
-```
-Доступность R2->R4
-```
-R2#show ip int br
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                unassigned      YES unset  up                    up
-Ethernet0/0.20             172.17.0.1      YES manual up                    up
-Ethernet0/1                unassigned      YES unset  administratively down down
-Ethernet0/2                unassigned      YES unset  administratively down down
-Ethernet0/3                unassigned      YES unset  administratively down down
-R2#ping 172.17.0.2
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 172.17.0.2, timeout is 2 seconds:
-.!!!!
-Success rate is 80 percent (4/5), round-trip min/avg/max = 4/5/10 ms
-```
-
-```
-root@leaf-3> show evpn instance EVPN_10 extensive
-Instance: EVPN_10
-  Route Distinguisher: 10.255.254.3:1
-  VLAN ID: 10
-  Encapsulation type: VXLAN
-  Duplicate MAC detection threshold: 5
-  Duplicate MAC detection window: 180
-  MAC database status                     Local  Remote
-    MAC advertisements:                       1       1
-    MAC+IP advertisements:                    1       1
-    Default gateway MAC advertisements:       0       0
-  Number of local interfaces: 2 (2 up)
-    Interface name  ESI                            Mode             Status     AC-Role
-    .local..8       00:00:00:00:00:00:00:00:00:00  single-homed     Up         Root
-    ge-0/0/2.0      00:00:00:00:00:00:00:00:00:00  single-homed     Up         Root
-  Number of IRB interfaces: 0 (0 up)
-  Number of protect interfaces: 0
-  Number of bridge domains: 1
-    VLAN  Domain ID   Intfs / up    IRB intf   Mode      MAC sync  IM route label  IPv4 SG sync  IPv4 IM core nexthop  IPv6 SG sync  IPv6 IM core nexthop
-    10    10010          1    1                Extended         Enabled   10010           Disabled                    Disabled
-  Number of neighbors: 1
-    Address               MAC    MAC+IP        AD        IM        ES Leaf-label
-    10.255.254.1            1         1         0         1         0
-  Number of ethernet segments: 0
-  Router-ID: 10.255.254.3
-  Source VTEP interface IP: 10.255.254.3
-  SMET Forwarding: Disabled
-```
-
-
-Детальное описание маршрута. т.е.VxLAN туннель от leaf-3 (10.255.254.3) будет построен до leaf-1(10.255.254.1)
-```
-root@leaf-3> show route evpn-mac-address aa:bb:cc:00:0b:00 table EVPN_10 detail
-
-EVPN_10.evpn.0: 6 destinations, 9 routes (6 active, 0 holddown, 0 hidden)
-2:10.255.254.1:1::0::aa:bb:cc:00:0b:00/304 MAC/IP (2 entries, 1 announced)
-        *BGP    Preference: 170/-101
-                Route Distinguisher: 10.255.254.1:1
-                Next hop type: Indirect, Next hop index: 0
-                Address: 0xce32a70
-                Next-hop reference count: 12
-                Source: 10.255.255.1
-                Protocol next hop: 10.255.254.1
-                Indirect next hop: 0x2 no-forward INH Session ID: 0x0
-                State: <Secondary Active Int Ext>
-                Local AS: 4210000001 Peer AS: 4210000001
-                Age: 7:28       Metric2: 0
-                Validation State: unverified
-                Task: BGP_4210000001.10.255.255.1
-                Announcement bits (1): 0-EVPN_10-evpn
-                AS path: I  (Originator)
-                Cluster list:  10.255.250.1
-                Originator ID: 10.255.254.1
-                Communities: target:1234:1 encapsulation:vxlan(0x8)
-                Import Accepted
-                Route Label: 10010
-                ESI: 00:00:00:00:00:00:00:00:00:00
-                Localpref: 100
-                Router ID: 10.255.255.1
-                Primary Routing Table bgp.evpn.0
-         BGP    Preference: 170/-101
-                Route Distinguisher: 10.255.254.1:1
-                Next hop type: Indirect, Next hop index: 0
-                Address: 0xce32a70
-                Next-hop reference count: 12
-                Source: 10.255.255.2
-                Protocol next hop: 10.255.254.1
-                Indirect next hop: 0x2 no-forward INH Session ID: 0x0
-                State: <Secondary NotBest Int Ext Changed>
-                Inactive reason: Not Best in its group - Update source
-                Local AS: 4210000001 Peer AS: 4210000001
-                Age: 7:28       Metric2: 0
-                Validation State: unverified
-                Task: BGP_4210000001.10.255.255.2
-                AS path: I  (Originator)
-                Cluster list:  10.255.250.1
-                Originator ID: 10.255.254.1
-                Communities: target:1234:1 encapsulation:vxlan(0x8)
-                Import Accepted
-                Route Label: 10010
-                ESI: 00:00:00:00:00:00:00:00:00:00
-                Localpref: 100
-                Router ID: 10.255.255.2
-                Primary Routing Table bgp.evpn.0
-
-2:10.255.254.1:1::0::aa:bb:cc:00:0b:00::10.5.5.10/304 MAC/IP (2 entries, 1 announced)
-        *BGP    Preference: 170/-101
-                Route Distinguisher: 10.255.254.1:1
-                Next hop type: Indirect, Next hop index: 0
-                Address: 0xce32a70
-                Next-hop reference count: 12
-                Source: 10.255.255.1
-                Protocol next hop: 10.255.254.1
-                Indirect next hop: 0x2 no-forward INH Session ID: 0x0
-                State: <Secondary Active Int Ext>
-                Local AS: 4210000001 Peer AS: 4210000001
-                Age: 7:28       Metric2: 0
-                Validation State: unverified
-                Task: BGP_4210000001.10.255.255.1
-                Announcement bits (1): 0-EVPN_10-evpn
-                AS path: I  (Originator)
-                Cluster list:  10.255.250.1
-                Originator ID: 10.255.254.1
-                Communities: target:1234:1 encapsulation:vxlan(0x8)
-                Import Accepted
-                Route Label: 10010
-                ESI: 00:00:00:00:00:00:00:00:00:00
-                Localpref: 100
-                Router ID: 10.255.255.1
-                Primary Routing Table bgp.evpn.0
-         BGP    Preference: 170/-101
-                Route Distinguisher: 10.255.254.1:1
-                Next hop type: Indirect, Next hop index: 0
-                Address: 0xce32a70
-                Next-hop reference count: 12
-                Source: 10.255.255.2
-                Protocol next hop: 10.255.254.1
-                Indirect next hop: 0x2 no-forward INH Session ID: 0x0
-                State: <Secondary NotBest Int Ext Changed>
-                Inactive reason: Not Best in its group - Update source
-                Local AS: 4210000001 Peer AS: 4210000001
-                Age: 7:28       Metric2: 0
-                Validation State: unverified
-                Task: BGP_4210000001.10.255.255.2
-                AS path: I  (Originator)
-                Cluster list:  10.255.250.1
-                Originator ID: 10.255.254.1
-                Communities: target:1234:1 encapsulation:vxlan(0x8)
-                Import Accepted
-                Route Label: 10010
-                ESI: 00:00:00:00:00:00:00:00:00:00
-                Localpref: 100
-                Router ID: 10.255.255.2
-                Primary Routing Table bgp.evpn.0
-```
-
-```
-root@leaf-3> show route protocol bgp    
-inet.0: 9 destinations, 11 routes (9 active, 0 holddown, 0 hidden)
-+ = Active Route, - = Last Active, * = Both
-
-10.255.254.1/32    *[BGP/170] 00:01:11, localpref 100, from 10.0.3.2
-                      AS path: 65501 65511 I, validation-state: unverified
-                      to 10.0.3.2 via xe-0/0/0.0
-                    > to 10.0.3.6 via xe-0/0/1.0
-                    [BGP/170] 00:01:11, localpref 100
-                      AS path: 65501 65511 I, validation-state: unverified
-                    > to 10.0.3.6 via xe-0/0/1.0
-10.255.254.2/32    *[BGP/170] 00:01:12, localpref 100, from 10.0.3.2
-                      AS path: 65501 65512 I, validation-state: unverified
-                      to 10.0.3.2 via xe-0/0/0.0
-                    > to 10.0.3.6 via xe-0/0/1.0
-                    [BGP/170] 00:01:12, localpref 100
-                      AS path: 65501 65512 I, validation-state: unverified
-                    > to 10.0.3.6 via xe-0/0/1.0
-```
-
-Доступность Leaf-1, Leaf-2, Spine-1, Spine-2 с Leaf-3
-```
-{master:0}
-root@leaf-3> ping 10.255.254.1 source 10.255.254.3 count 1
-PING 10.255.254.1 (10.255.254.1): 56 data bytes
-64 bytes from 10.255.254.1: icmp_seq=0 ttl=63 time=296.561 ms
-
---- 10.255.254.1 ping statistics ---
-1 packets transmitted, 1 packets received, 0% packet loss
-round-trip min/avg/max/stddev = 296.561/296.561/296.561/0.000 ms
-
-{master:0}
-root@leaf-3> ping 10.255.254.2 source 10.255.254.3 count 1
-PING 10.255.254.2 (10.255.254.2): 56 data bytes
-64 bytes from 10.255.254.2: icmp_seq=0 ttl=63 time=311.989 ms
-
---- 10.255.254.2 ping statistics ---
-1 packets transmitted, 1 packets received, 0% packet loss
-round-trip min/avg/max/stddev = 311.989/311.989/311.989/0.000 ms
-```
-
-Multipath работает
-```
-{master:0}
-root@leaf-3> show route 10.255.254.1 detail 
-
-inet.0: 9 destinations, 11 routes (9 active, 0 holddown, 0 hidden)
-10.255.254.1/32 (2 entries, 1 announced)
-        *BGP    Preference: 170/-101
-                Next hop type: Router, Next hop index: 0
-                Address: 0xb21bb10
-                Next-hop reference count: 3
-                Source: 10.0.3.2
-                Next hop: 10.0.3.2 via xe-0/0/0.0
-                Session Id: 0x0
-                Next hop: 10.0.3.6 via xe-0/0/1.0, selected
-                Session Id: 0x0
-                State: <Active Ext>
-                Peer AS: 65501
-                Age: 2:18
-                Validation State: unverified
-                Task: BGP_65501_65513.10.0.3.2
-                Announcement bits (2): 0-KRT 1-BGP_Listen.0.0.0.0+179
-                AS path: 65501 65511 I
-                Accepted Multipath
-                Localpref: 100
-                Router ID: 10.255.255.1
-         BGP    Preference: 170/-101
-                Next hop type: Router, Next hop index: 1740
-                Address: 0xb3a1630
-                Next-hop reference count: 3
-                Source: 10.0.3.6
-                Next hop: 10.0.3.6 via xe-0/0/1.0, selected
-                Session Id: 0x0
-                State: <NotBest Ext>
-                Inactive reason: Not Best in its group - Active preferred
-                Peer AS: 65501
-                Age: 2:18
-                Validation State: unverified
-                Task: BGP_65501_65513.10.0.3.6
-                AS path: 65501 65511 I
-                Accepted MultipathContrib
-                Localpref: 100
-                Router ID: 10.255.255.2
-```
-
-```
-R1#traceroute 31.173.128.1 numeric
-Type escape sequence to abort.
-Tracing the route to 31.173.128.1
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.5.5.100 4 msec 2 msec 8 msec
-  2 10.5.5.200 7 msec 5 msec 5 msec
-  3 31.173.128.1 10 msec 8 msec 6 msec
-  
-R1#ping 31.173.128.1
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 31.173.128.1, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 7/8/10 ms
-R1#
+spine-1#sh ip bgp summary
+BGP summary information for VRF default
+Router identifier 192.1.1.0, local AS number 65000
+Neighbor Status Codes: m - Under maintenance
+  Neighbor  V AS           MsgRcvd   MsgSent  InQ OutQ  Up/Down State   PfxRcd PfxAcc
+  192.1.0.1 4 65001           3115      3131    0    0 01:50:34 Estab   2      2
+  192.1.0.2 4 65002           3099      3094    0    0 01:50:31 Estab   2      2
+  192.1.0.3 4 65003           2974      3034    0    0 01:50:31 Estab   2      2
+  192.4.1.1 4 65001             90        91    0    0 00:03:39 Estab   3      2
+  192.4.1.3 4 65002             90        91    0    0 00:03:38 Estab   3      2
+  192.4.1.5 4 65003             90        91    0    0 00:03:38 Estab   3      2
 ```
 
 
 
-```
-R2#traceroute 31.173.128.1 numeric
-Type escape sequence to abort.
-Tracing the route to 31.173.128.1
-VRF info: (vrf in name/id, vrf out name/id)
-  1 172.17.0.100 3 msec 1 msec 2 msec
-  2 10.5.5.200 7 msec 3 msec 6 msec
-  3 31.173.128.1 7 msec 14 msec 11 msec
-
-R2#ping 31.173.128.1
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 31.173.128.1, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 6/7/9 ms
-```
 
 ```
-R3#traceroute 31.173.128.1 numeric
-Type escape sequence to abort.
-Tracing the route to 31.173.128.1
-VRF info: (vrf in name/id, vrf out name/id)
-  1 10.5.5.200 2 msec 2 msec 2 msec
-  2 31.173.128.1 5 msec 4 msec 4 msec
+leaf1#sh bgp evpn vni 999
+BGP routing table information for VRF default
+Router identifier 192.1.0.1, local AS number 65001
+Route status codes: s - suppressed, * - valid, > - active, E - ECMP head, e - ECMP
+                    S - Stale, c - Contributing to ECMP, b - backup
+                    % - Pending BGP convergence
+Origin codes: i - IGP, e - EGP, ? - incomplete
+AS Path Attributes: Or-ID - Originator ID, C-LST - Cluster List, LL Nexthop - Link Local Nexthop
 
-R3#ping 31.173.128.1
-Type escape sequence to abort.
-Sending 5, 100-byte ICMP Echos to 31.173.128.1, timeout is 2 seconds:
-!!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 3/3/5 ms
-R3#
+          Network                Next Hop              Metric  LocPref Weight  Path
+ * >Ec   RD: 65003:100100 mac-ip 0050.7966.6808 10.10.2.11
+                                 192.100.0.3           -       100     0       65000 65003 i
+ *  ec   RD: 65003:100100 mac-ip 0050.7966.6808 10.10.2.11
+                                 192.100.0.3           -       100     0       65000 65003 i
+ * >     RD: 65001:100100 mac-ip 5018.00c9.18c1 10.10.2.10
+                                 -                     -       -       0       i
+ * >Ec   RD: 65003:999 ip-prefix 0.0.0.0/0
+                                 192.100.0.3           -       100     0       65000 65003 64009 ?
+ *  ec   RD: 65003:999 ip-prefix 0.0.0.0/0
+                                 192.100.0.3           -       100     0       65000 65003 64009 ?
+ * >Ec   RD: 65003:999 ip-prefix 8.8.4.4/32
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ *  ec   RD: 65003:999 ip-prefix 8.8.4.4/32
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ * >Ec   RD: 65003:999 ip-prefix 8.8.8.8/32
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ *  ec   RD: 65003:999 ip-prefix 8.8.8.8/32
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ * >     RD: 65001:999 ip-prefix 10.10.2.0/24
+                                 -                     -       -       0       i
+ * >Ec   RD: 65002:999 ip-prefix 10.10.2.0/24
+                                 192.100.0.2           -       100     0       65000 65002 i
+ *  ec   RD: 65002:999 ip-prefix 10.10.2.0/24
+                                 192.100.0.2           -       100     0       65000 65002 i
+ * >Ec   RD: 65003:999 ip-prefix 10.10.2.0/24
+                                 192.100.0.3           -       100     0       65000 65003 i
+ *  ec   RD: 65003:999 ip-prefix 10.10.2.0/24
+                                 192.100.0.3           -       100     0       65000 65003 i
+ * >     RD: 65001:999 ip-prefix 10.10.3.0/24
+                                 -                     -       -       0       i
+ * >Ec   RD: 65003:999 ip-prefix 10.10.3.0/24
+                                 192.100.0.3           -       100     0       65000 65003 i
+ *  ec   RD: 65003:999 ip-prefix 10.10.3.0/24
+                                 192.100.0.3           -       100     0       65000 65003 i
+ * >Ec   RD: 65003:999 ip-prefix 10.200.0.1/32
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ *  ec   RD: 65003:999 ip-prefix 10.200.0.1/32
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ * >Ec   RD: 65003:999 ip-prefix 33.33.33.0/24
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ *  ec   RD: 65003:999 ip-prefix 33.33.33.0/24
+                                 192.100.0.3           -       100     0       65000 65003 64009 i
+ * >Ec   RD: 65003:999 ip-prefix 66.66.66.0/24
+                                 192.100.0.3           -       100     0       65000 65003 i
+ *  ec   RD: 65003:999 ip-prefix 66.66.66.0/24
+                                 192.100.0.3           -       100     0       65000 65003 i
+```
+
+### Связанность клиентов
+VPC8 - SRV - INTERNET 
+```
+VPCS> ping 10.10.2.10
+
+84 bytes from 10.10.2.10 icmp_seq=1 ttl=64 time=12.974 ms
+84 bytes from 10.10.2.10 icmp_seq=2 ttl=64 time=14.298 ms
+84 bytes from 10.10.2.10 icmp_seq=3 ttl=64 time=15.029 ms
+^C
+VPCS> ping 8.8.8.8
+
+84 bytes from 8.8.8.8 icmp_seq=1 ttl=63 time=8.284 ms
+84 bytes from 8.8.8.8 icmp_seq=2 ttl=63 time=7.422 ms
+84 bytes from 8.8.8.8 icmp_seq=3 ttl=63 time=7.204 ms
+^C
+VPCS>
+
+```
+VPC9 - VPC8 - SRV - INTERNET
+```
+VPCS> ping 10.10.3.10
+
+10.10.3.10 icmp_seq=1 timeout
+84 bytes from 10.10.3.10 icmp_seq=2 ttl=64 time=13.801 ms
+84 bytes from 10.10.3.10 icmp_seq=3 ttl=64 time=19.272 ms
+84 bytes from 10.10.3.10 icmp_seq=4 ttl=64 time=17.746 ms
+^C
+VPCS> ping 10.10.2.11
+
+84 bytes from 10.10.2.11 icmp_seq=1 ttl=63 time=5.962 ms
+84 bytes from 10.10.2.11 icmp_seq=2 ttl=63 time=5.783 ms
+84 bytes from 10.10.2.11 icmp_seq=3 ttl=63 time=5.597 ms
+^C
+VPCS> ping 8.8.4.4
+
+84 bytes from 8.8.4.4 icmp_seq=1 ttl=63 time=7.159 ms
+84 bytes from 8.8.4.4 icmp_seq=2 ttl=63 time=8.395 ms
+84 bytes from 8.8.4.4 icmp_seq=3 ttl=63 time=8.937 ms
+^C
+VPCS>
+```
+Проверка связанности сетевого оборудования через Lo
+```
+leaf1#ping 192.1.0.2 source 192.1.0.1
+PING 192.1.0.2 (192.1.0.2) from 192.1.0.1 : 72(100) bytes of data.
+80 bytes from 192.1.0.2: icmp_seq=1 ttl=63 time=6.17 ms
+80 bytes from 192.1.0.2: icmp_seq=2 ttl=63 time=5.48 ms
+80 bytes from 192.1.0.2: icmp_seq=3 ttl=63 time=5.70 ms
+80 bytes from 192.1.0.2: icmp_seq=4 ttl=63 time=5.61 ms
+80 bytes from 192.1.0.2: icmp_seq=5 ttl=63 time=5.65 ms
+
+--- 192.1.0.2 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 31ms
+rtt min/avg/max/mdev = 5.482/5.726/6.178/0.242 ms, ipg/ewma 7.880/5.947 ms
+leaf1#
+leaf1#ping 192.1.0.3 ource 192.1.0.1
+PING 192.1.0.3 (192.1.0.3) from 192.1.0.1 : 72(100) bytes of data.
+80 bytes from 192.1.0.3: icmp_seq=1 ttl=63 time=6.34 ms
+80 bytes from 192.1.0.3: icmp_seq=2 ttl=63 time=6.26 ms
+80 bytes from 192.1.0.3: icmp_seq=3 ttl=63 time=6.42 ms
+80 bytes from 192.1.0.3: icmp_seq=4 ttl=63 time=5.70 ms
+80 bytes from 192.1.0.3: icmp_seq=5 ttl=63 time=5.32 ms
+
+--- 192.1.0.3 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 31ms
+rtt min/avg/max/mdev = 5.320/6.010/6.423/0.439 ms, ipg/ewma 7.796/6.147 ms
+
+leaf1#
+leaf1#ping 192.1.2. source 192.1.0.1
+PING 192.1.2.0 (192.1.2.0) from 192.1.0.1 : 72(100) bytes of data.
+80 bytes from 192.1.2.0: icmp_seq=1 ttl=64 time=2.91 ms
+80 bytes from 192.1.2.0: icmp_seq=2 ttl=64 time=2.17 ms
+80 bytes from 192.1.2.0: icmp_seq=3 ttl=64 time=1.91 ms
+80 bytes from 192.1.2.0: icmp_seq=4 ttl=64 time=3.54 ms
+80 bytes from 192.1.2.0: icmp_seq=5 ttl=64 time=1.99 ms
+
+--- 192.1.2.0 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 15ms
+rtt min/avg/max/mdev = 1.913/2.508/3.546/0.627 ms, ipg/ewma 3.943/2.709 ms
+leaf1#
+leaf1#ping 192.1.1. source 192.1.0.1
+PING 192.1.1.0 (192.1.1.0) from 192.1.0.1 : 72(100) bytes of data.
+80 bytes from 192.1.1.0: icmp_seq=1 ttl=64 time=2.86 ms
+80 bytes from 192.1.1.0: icmp_seq=2 ttl=64 time=2.27 ms
+80 bytes from 192.1.1.0: icmp_seq=3 ttl=64 time=2.09 ms
+80 bytes from 192.1.1.0: icmp_seq=4 ttl=64 time=4.29 ms
+80 bytes from 192.1.1.0: icmp_seq=5 ttl=64 time=2.30 ms
+
+--- 192.1.1.0 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 19ms
+rtt min/avg/max/mdev = 2.094/2.766/4.293/0.808 ms, ipg/ewma 4.858/2.829 ms
 ```
 
 
+Проверка MLAG
+```
+leaf1# sh mlag
+MLAG Configuration:
+domain-id                          :               mlag1
+local-interface                    :            Vlan4094
+peer-address                       :         10.10.100.1
+peer-link                          :       Port-Channel1
+peer-config                        :        inconsistent
 
-## Итого
+MLAG Status:
+state                              :              Active
+negotiation status                 :           Connected
+peer-link status                   :                  Up
+local-int status                   :                  Up
+system-id                          :   52:18:00:27:35:a8
+dual-primary detection             :            Disabled
+dual-primary interface errdisabled :               False
+
+MLAG Ports:
+Disabled                           :                   0
+Configured                         :                   0
+Inactive                           :               0
+Active-partial                     :                   0
+Active-full                        :                   1
+
+```
+
+
+## Вывод
 
 Смоделирована сеть для ЦОД дизайном CLOS с применением модных техногий в виде EVPN VXVLAN. Применено резервирование MLAG.
